@@ -9,6 +9,7 @@
     <script src="js/bootstrap.min.js"></script>
     <script src="d3/d3.min.js"></script>
     <script src="//d3js.org/topojson.v0.min.js"></script>
+    <script src="main.js"></script>
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -29,8 +30,11 @@
 				<button type="button" class="btn btn-primary" id="about-viz-hide">Hide about section</button>
 			</div>
 		</div>
-		<div class="row" id="slide1">
-			<h2>Quality of life index</h2>
+	</div>
+
+	<div class="container" id="slide1">
+		<div class="row">
+			<h2>Overall quality of life index</h2>
 			<div class="col-md-8">
 				<svg id="svg-quality-of-life" viewBox="0 0 1000 450" width="100%" height="400px"></svg>
 			</div>
@@ -43,110 +47,49 @@
 				</p>
 			</div>
 		</div>
+	</div>
 
-		<div class="row" id="slide2">
-			<h2>Best countries based on personal preferences</h2>
-
+	<div class="container" id="slide2">
+		<div class="row">
+			<div class="col-md-12">
+				<h2>Best countries based on personal preferences</h2>
+				<div class="well text-center">
+				<form class="form-inline">
+					<div class="form-group">
+						<label for="input" class="control-label">Select a Life Quality Index:</label>
+						<select name="custom-index" id="custom-index" class="form-control">
+							<option value="Rank" selected>Rank</option>
+							<option value="Quality of Life Index">Quality of Life</option>
+							<option value="Purchasing Power Index">Purchasing Power</option>
+							<option value="Safety Index">Safety</option>
+							<option value="Health Care Index">Health Care</option>
+							<option value="Cost of Living Index">Cost of Living</option>
+							<option value="Property Price to Income Ratio">Property Price to Income Ratio</option>
+							<option value="Traffic Commute Time Index">Traffic Commute Time</option>
+							<option value="Pollution Index">Pollution</option>
+							<option value="Climate Index">Climate</option>
+						</select>
+					</div>
+				</form>
+				</div>
+			</div>
 		</div>
-
+	
+		<div class="row">
+			<div class="col-md-6">
+				<svg id="svg-custom" viewBox="0 0 1000 450" width="100%" height="300px"></svg>
+			</div>
+			<div class="col-md-6">
+				<svg id="svg-prop-bar" width="100%" height="300px"></svg>
+			</div>
+		</div>
+		
 	</div>
 	
 <script>
 $('#about-viz-btn').click(function(){ $('#about-viz').toggleClass('hide'); });
 $('#about-viz-hide').click(function(){ $('#about-viz').addClass('hide'); });
 </script>
-
-<script>
-	var projection = d3.geoMercator();
-	var data = null;
-
-	var qualityOfLifeColors = null;
-
-	function getDomain(prop) {
-		var scale = _.map(data.features, function(node) {
-			if (node.properties[prop]) return node.properties[prop];
-			else return null;
-		});
-		scale = _.uniq(scale);
-		 return d3.extent(scale);
-	}
-
-	function setScales() {
-		qualityOfLifeColors = d3.scaleLinear().domain(getDomain('Quality of Life Index')).range(['red','green']);
-	}
-
-	function loadData(csv, json) {
-		var countries = json;
-		var csvData = _.indexBy(d3.csvParse(csv), 'Country');
-		countries.features = _.map(countries.features, function(node) {
-			if (csvData[node.properties.name]) {
-				var countryData = csvData[node.properties.name];
-				for (var k in countryData) {
-					if (k != 'Country') countryData[k] = countryData[k]*1;
-				}
-				node.properties = countryData;
-			} else {
-				node.properties = {Country: node.properties.name}
-			}
-			return node;
-		});
-
-		return countries;
-	}
-
-	function loadSlide1() {
-		var svg = d3.select("#slide1 svg");
-
-		var path = d3.geoPath()
-			.projection(projection);
-
-		var g = svg.append("g");
-
-		g.selectAll("path")
-			.data(data.features)
-			.enter()
-			.append("path")
-			.attr("d", path)
-			.style("fill-opacity", 0.7)
-			.style("fill", function(data){
-				if (data.properties['Quality of Life Index']) {
-					return qualityOfLifeColors(data.properties['Quality of Life Index']);
-				}
-				else return "lightgrey";
-			}).on('mouseover', function(d, i){
-				d3.select(this).style('fill-opacity', 1);
-				$('#map-help').hide();
-				$('#country-name').text(d.properties['Country']);
-				var prop = $('#country-properties').empty();
-				_.each(d.properties, function(v, k) {
-					prop.append("<li><b>"+k+":</b> " + v + "</li>")
-				});
-			}).on('mouseout', function(d, i) {
-				g.selectAll("path").style('fill-opacity', 0.7);
-				$('#country-name').empty();
-				$('#country-properties').empty();
-				$('#map-help').show();
-			});
-
-	}
-
-	function loadViz() {
-		loadSlide1();
-
-	}
-
-	$.when($.get('data/quality-of-life.csv'), $.getJSON('data/countries.geo.json'))
-		.then(function(v1, v2) {
-			var csv = v1[0];
-			var json = v2[0];
-			data = loadData(csv, json);
-			setScales();
-			loadViz();
-		});
-
-</script>
-
-
 
 </body>
 

@@ -2,3 +2,20 @@
   width: 970px;
   max-width: none !important;
 }
+
+.country {
+	stroke: #999;
+}
+
+.row { margin-bottom: 10px; }
+
+div.tooltip {	
+    position: absolute;			
+    padding: 5px 5px;				
+    font: 12px sans-serif;		
+    background: lightsteelblue;	
+    border: 0px;		
+    border-radius: 2px;			
+    pointer-events: none;			
+}
+.tooltip td { padding: 2px 5px; }
