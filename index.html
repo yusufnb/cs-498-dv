@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+
+
+<html>
+<head>
+	<meta charset="utf-8">
+    <script src="js/underscore.min.js"></script>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="d3/d3.min.js"></script>
+    <script src="//d3js.org/topojson.v0.min.js"></script>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+	<div class="container">
+		<h1>CS 498 Final Project - ynb2</h1>
+		<div class="row">
+			<div class="col-md-12">
+				<h2>Where to live?</h2>
+				<p>This visualization narrative uses quality of life index data to explore different countries in the world with perspective of things that affect quality of life.</p>
+				<button type="button" class="btn btn-primary pull-right" id="about-viz-btn">More about this visualization</button>
+			</div>
+		</div>
+		<div class="row hide" id="about-viz">
+			<div class="col-md-12">
+				<p>asdfld</p>
+
+				<button type="button" class="btn btn-primary" id="about-viz-hide">Hide about section</button>
+			</div>
+		</div>
+		<div class="row" id="slide1">
+			<h2>Quality of life index</h2>
+			<div class="col-md-8">
+				<svg id="svg-quality-of-life" viewBox="0 0 1000 450" width="100%" height="400px"></svg>
+			</div>
+			<div class="col-md-4">
+				<h4 id="country-name"></h4>
+				<ul id="country-properties">
+				</ul>
+				<p id="map-help">
+					Move mouse over the countries to see Quality of Life properties
+				</p>
+			</div>
+		</div>
+
+		<div class="row" id="slide2">
+			<h2>Best countries based on personal preferences</h2>
+
+		</div>
+
+	</div>
+	
+<script>
+$('#about-viz-btn').click(function(){ $('#about-viz').toggleClass('hide'); });
+$('#about-viz-hide').click(function(){ $('#about-viz').addClass('hide'); });
+</script>
+
+<script>
+	var projection = d3.geoMercator();
+	var data = null;
+
+	var qualityOfLifeColors = null;
+
+	function getDomain(prop) {
+		var scale = _.map(data.features, function(node) {
+			if (node.properties[prop]) return node.properties[prop];
+			else return null;
+		});
+		scale = _.uniq(scale);
+		 return d3.extent(scale);
+	}
+
+	function setScales() {
+		qualityOfLifeColors = d3.scaleLinear().domain(getDomain('Quality of Life Index')).range(['red','green']);
+	}
+
+	function loadData(csv, json) {
+		var countries = json;
+		var csvData = _.indexBy(d3.csvParse(csv), 'Country');
+		countries.features = _.map(countries.features, function(node) {
+			if (csvData[node.properties.name]) {
+				var countryData = csvData[node.properties.name];
+				for (var k in countryData) {
+					if (k != 'Country') countryData[k] = countryData[k]*1;
+				}
+				node.properties = countryData;
+			} else {
+				node.properties = {Country: node.properties.name}
+			}
+			return node;
+		});
+
+		return countries;
+	}
+
+	function loadSlide1() {
+		var svg = d3.select("#slide1 svg");
+
+		var path = d3.geoPath()
+			.projection(projection);
+
+		var g = svg.append("g");
+
+		g.selectAll("path")
+			.data(data.features)
+			.enter()
+			.append("path")
+			.attr("d", path)
+			.style("fill-opacity", 0.7)
+			.style("fill", function(data){
+				if (data.properties['Quality of Life Index']) {
+					return qualityOfLifeColors(data.properties['Quality of Life Index']);
+				}
+				else return "lightgrey";
+			}).on('mouseover', function(d, i){
+				d3.select(this).style('fill-opacity', 1);
+				$('#map-help').hide();
+				$('#country-name').text(d.properties['Country']);
+				var prop = $('#country-properties').empty();
+				_.each(d.properties, function(v, k) {
+					prop.append("<li><b>"+k+":</b> " + v + "</li>")
+				});
+			}).on('mouseout', function(d, i) {
+				g.selectAll("path").style('fill-opacity', 0.7);
+				$('#country-name').empty();
+				$('#country-properties').empty();
+				$('#map-help').show();
+			});
+
+	}
+
+	function loadViz() {
+		loadSlide1();
+
+	}
+
+	$.when($.get('data/quality-of-life.csv'), $.getJSON('data/countries.geo.json'))
+		.then(function(v1, v2) {
+			var csv = v1[0];
+			var json = v2[0];
+			data = loadData(csv, json);
+			setScales();
+			loadViz();
+		});
+
+</script>
+
+
+
+</body>
+
+</html>
