@@ -19,3 +19,7 @@ div.tooltip {
     pointer-events: none;			
 }
 .tooltip td { padding: 2px 5px; }
+
+#svg-prop-bar rect {
+  fill: steelblue;
+}

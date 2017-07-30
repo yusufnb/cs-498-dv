@@ -17,8 +17,28 @@
 	<div class="container">
 		<h1>CS 498 Final Project - ynb2</h1>
 		<div class="row">
+			<div class="col-md-6"><h2>Where to live?</h2></div>
+			<div class="col-md-6">
+				<svg width="450px" height="30px">
+					<defs>
+						<linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+							<stop offset="0%" style="stop-color:green;stop-opacity:1" />
+							<stop offset="100%" style="stop-color:red;stop-opacity:1" />
+						</linearGradient>
+					</defs>				
+					<rect x="25" y="5" width="400" height="20" fill="url(#grad1)"></rect>
+					<text x="30" y="20" font-family="Verdana" font-size="10">
+				    	Better
+				  	</text>
+					<text x="390" y="20" font-family="Verdana" font-size="10">
+				    	Worse
+				  	</text>
+				</svg>				
+			</div>
+		</div>
+		<div class="row">
 			<div class="col-md-12">
-				<h2>Where to live?</h2>
+				
 				<p>This visualization narrative uses quality of life index data to explore different countries in the world with perspective of things that affect quality of life.</p>
 				<button type="button" class="btn btn-primary pull-right" id="about-viz-btn">More about this visualization</button>
 			</div>
@@ -30,11 +50,17 @@
 				<button type="button" class="btn btn-primary" id="about-viz-hide">Hide about section</button>
 			</div>
 		</div>
+		<div class="row">
+			<div class="col-md-12">
+
+			</div>
+		</div>
 	</div>
 
 	<div class="container" id="slide1">
 		<div class="row">
 			<h2>Overall quality of life index</h2>
+			<p>The following chart displays the quality of life index based on data and analysis at https://www.numbeo.com/quality-of-life/ and visualized according to the above legend. Move your mouse over each country to browse details of various indexes that make up the quality of life index. </p>
 			<div class="col-md-8">
 				<svg id="svg-quality-of-life" viewBox="0 0 1000 450" width="100%" height="400px"></svg>
 			</div>
@@ -53,21 +79,21 @@
 		<div class="row">
 			<div class="col-md-12">
 				<h2>Best countries based on personal preferences</h2>
+				<p>Where to live is a very subjective question. The following visualization allows you to see different countries and their relative ranking using various perspectives.</p>
 				<div class="well text-center">
 				<form class="form-inline">
 					<div class="form-group">
 						<label for="input" class="control-label">Select a Life Quality Index:</label>
 						<select name="custom-index" id="custom-index" class="form-control">
-							<option value="Rank" selected>Rank</option>
-							<option value="Quality of Life Index">Quality of Life</option>
-							<option value="Purchasing Power Index">Purchasing Power</option>
-							<option value="Safety Index">Safety</option>
-							<option value="Health Care Index">Health Care</option>
-							<option value="Cost of Living Index">Cost of Living</option>
-							<option value="Property Price to Income Ratio">Property Price to Income Ratio</option>
-							<option value="Traffic Commute Time Index">Traffic Commute Time</option>
-							<option value="Pollution Index">Pollution</option>
-							<option value="Climate Index">Climate</option>
+							<option value="Quality of Life Index" selected data-order="desc">Quality of Life</option>
+							<option value="Purchasing Power Index" data-order="desc">Purchasing Power</option>
+							<option value="Safety Index" data-order="desc">Safety</option>
+							<option value="Health Care Index" data-order="desc">Health Care</option>
+							<option value="Cost of Living Index" data-order="asc">Cost of Living</option>
+							<option value="Property Price to Income Ratio" data-order="asc">Property Price to Income Ratio</option>
+							<option value="Traffic Commute Time Index" data-order="asc">Traffic Commute Time</option>
+							<option value="Pollution Index" data-order="asc">Pollution</option>
+							<option value="Climate Index" data-order="desc">Climate</option>
 						</select>
 					</div>
 				</form>
